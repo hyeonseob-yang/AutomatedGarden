@@ -3,7 +3,9 @@
  *  Temperature: https://learn.adafruit.com/tmp36-temperature-sensor
  *  Relay Info: https://www.youtube.com/watch?v=kfPzXbhTQQk
  *  Water Pump: https://www.youtube.com/watch?v=Z0SZ-jzu_q8
+ *  Servo Motor: https://docs.arduino.cc/learn/electronics/servo-motors
  */
+#include <Servo.h>
 
 int moisturePin = 0;
 const int DRY = 932;
@@ -11,8 +13,8 @@ const int WET = 603;
 const int MOISTURE_CUTOFF = (DRY + WET) / 2;
 
 int lightPin = 1;
-const int DARK = 0;
-const int LIGHT = 1;
+const int DARK = 5;
+const int LIGHT = 135;
 const int MID_LIGHT = (DARK + LIGHT) / 2;
 int lightTime = 0;
 int totalTime = 0;
@@ -25,17 +27,24 @@ const int ANALOG_INPUT_MAX = 1023;
 
 int pumpPin = 7;
 
+Servo servo;
 int motorPin = 9;
 int currentAngle = 0;
 int angleCoefficient = 1;
 const int FIXED_ROTATION = 30;
 const int ANGLE_MAX = 180;
 const int ANALOG_OUTPUT_MAX = 255;
+// Time in seconds to wait before rotating again
+const int rotatePeriod = 5;
+int rotateTimer = 0;
 
 void setup() {
   Serial.begin(9600);
   pinMode(pumpPin, OUTPUT);
-  pinMode(motorPin, OUTPUT);
+  servo.attach(9);
+  servo.write(0);
+  // Wait for motor to get into starting position
+  delay(1000);
 }
 
 void loop() {
@@ -47,25 +56,39 @@ void loop() {
   }
   totalTime++;
   int lightPercent = (float) lightTime / totalTime * 100;
-  int temp = getTemp();
+  float temp = getTemp();
   printData(humidity, lightPercent, temp);
-  if (!isWet(humidity)) {
-    pumpWater();
+
+  bool willRotate = shouldRotate();
+  if (willRotate) {
+//    if (!isWet(humidity)) {
+//      pumpWater();
+//    } else {
+      rotateChassis(FIXED_ROTATION);
+//    }
   } else {
-    rotateChassis(FIXED_ROTATION);
+    rotateTimer++;
   }
   
+}
+
+bool shouldRotate() {
+  // Use + 1 because rotate code will increment once
+  bool willRotate = rotateTimer % (rotatePeriod + 1) <= 0;
+  return willRotate;
 }
 
 void rotateChassis(int angle) {
   angle *= angleCoefficient;
   currentAngle += angle;
-  if (currentAngle <= 0 || currentAngle >= ANGLE_MAX) {
-    angleCoefficient *= -1;
-  }
-  int analogAngle = map(currentAngle, 0, ANGLE_MAX, 0, ANALOG_OUTPUT_MAX);
-  analogWrite(motorPin, analogAngle);
+  servo.write(currentAngle);
   delay(100);
+  if (currentAngle == ANGLE_MAX) {
+    // Set so next call to rotate chassis will go to 0
+    currentAngle = angle * -1;
+    // Set so motor will wait for rotatePeriod to pass
+    rotateTimer++;
+  }
 }
 
 void pumpWater() {
@@ -93,14 +116,14 @@ int isBright(int light) {
   return light > MID_LIGHT;
 }
 
-int getTemp() {
+float getTemp() {
   // ACCURACY OF TEMP SENSOR HAS A VARIANCE OF ABOUT 4 C
   int tempVal = analogRead(tempPin);
   float temp = ((((float)tempVal / ANALOG_INPUT_MAX) * MAX_MILLIVOLTS) - TEMP_CONSTANT) / TEMP_COEFFICIENT;
   return temp;
 }
 
-void printData(int humidity, int lightPercent, int temp) {
+void printData(int humidity, int lightPercent, float temp) {
   Serial.print("aaa");
   Serial.print(humidity);
   Serial.println("aaa");
