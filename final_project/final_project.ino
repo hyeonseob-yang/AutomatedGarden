@@ -18,6 +18,7 @@ const int LIGHT = 135;
 const int MID_LIGHT = (DARK + LIGHT) / 2;
 int lightTime = 0;
 int totalTime = 0;
+const int PERCENT = 100;
 
 int tempPin = 2;
 const int MAX_MILLIVOLTS = 5000;
@@ -26,6 +27,7 @@ const int TEMP_COEFFICIENT = 10;
 const int ANALOG_INPUT_MAX = 1023;
 
 int pumpPin = 7;
+const int WATER_TIME = 1000;
 
 Servo servo;
 int motorPin = 9;
@@ -48,24 +50,24 @@ void setup() {
 }
 
 void loop() {
-  delay(1000);
+  delay(WATER_TIME);
   int humidity = getMoisture();
   int light = getLight();
   if (isBright(light)) {
     lightTime++;
   }
   totalTime++;
-  int lightPercent = (float) lightTime / totalTime * 100;
+  int lightPercent = (float) lightTime / totalTime * PERCENT;
   float temp = getTemp();
   printData(humidity, lightPercent, temp);
 
   bool willRotate = shouldRotate();
   if (willRotate) {
-//    if (!isWet(humidity)) {
-//      pumpWater();
-//    } else {
+    if (!isWet(humidity)) {
+      pumpWater();
+    } else {
       rotateChassis(FIXED_ROTATION);
-//    }
+    }
   } else {
     rotateTimer++;
   }
@@ -99,7 +101,7 @@ void pumpWater() {
 
 int getMoisture() {
   int moistureVal = analogRead(moisturePin);
-  int percentageHumidity = 100 * (float)(DRY - moistureVal) / (float)(DRY - WET);
+  int percentageHumidity = (float)(DRY - moistureVal) / (float)(DRY - WET) * PERCENT;
   return percentageHumidity;
 }
 
