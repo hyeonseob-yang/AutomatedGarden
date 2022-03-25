@@ -8,9 +8,9 @@
 #include <Servo.h>
 
 int moisturePin = 0;
-const int DRY = 932;
-const int WET = 603;
-const int MOISTURE_CUTOFF = (DRY + WET) / 2;
+const int DRY = 500;
+const int WET = 400;
+const int MOISTURE_CUTOFF = 50;
 
 int lightPin = 1;
 const int DARK = 5;
@@ -39,6 +39,7 @@ const int ANALOG_OUTPUT_MAX = 255;
 // Time in seconds to wait before rotating again
 const int rotatePeriod = 5;
 int rotateTimer = 0;
+const int NUM_STEPS = 7;
 
 void setup() {
   Serial.begin(9600);
@@ -64,9 +65,7 @@ void loop() {
   bool willRotate = shouldRotate();
   if (willRotate) {
     if (!isWet(humidity)) {
-      pumpWater();
-    } else {
-      rotateChassis(FIXED_ROTATION);
+      water();
     }
   } else {
     rotateTimer++;
@@ -80,14 +79,21 @@ bool shouldRotate() {
   return willRotate;
 }
 
+void water() {
+  for (int i=0; i < NUM_STEPS; i++) {
+    pumpWater();
+    rotateChassis(FIXED_ROTATION);
+  }
+  servo.write(0);
+}
+
+
 void rotateChassis(int angle) {
   angle *= angleCoefficient;
   currentAngle += angle;
   servo.write(currentAngle);
   delay(100);
   if (currentAngle == ANGLE_MAX) {
-    // Set so next call to rotate chassis will go to 0
-    currentAngle = angle * -1;
     // Set so motor will wait for rotatePeriod to pass
     rotateTimer++;
   }
@@ -97,15 +103,20 @@ void pumpWater() {
   digitalWrite(pumpPin, HIGH);
   delay(1000);
   digitalWrite(pumpPin, LOW);
+  delay(1000);
 }
 
 int getMoisture() {
   int moistureVal = analogRead(moisturePin);
+  Serial.print("Moisture: ");
+  Serial.println(moistureVal);
   int percentageHumidity = (float)(DRY - moistureVal) / (float)(DRY - WET) * PERCENT;
   return percentageHumidity;
 }
 
 bool isWet(int humidity) {
+  Serial.print("Moisture Cutoff: ");
+  Serial.println(MOISTURE_CUTOFF);
   return humidity > MOISTURE_CUTOFF;
 }
 
@@ -115,7 +126,7 @@ int getLight() {
 }
 
 int isBright(int light) {
-  return light > MID_LIGHT;
+  return light < MID_LIGHT;
 }
 
 float getTemp() {
