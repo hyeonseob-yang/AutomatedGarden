@@ -44,7 +44,7 @@ const int NUM_STEPS = 7;
 void setup() {
   Serial.begin(9600);
   pinMode(pumpPin, OUTPUT);
-  servo.attach(9);
+  servo.attach(motorPin);
   servo.write(0);
   // Wait for motor to get into starting position
   delay(1000);
@@ -84,7 +84,8 @@ void water() {
     pumpWater();
     rotateChassis(FIXED_ROTATION);
   }
-  servo.write(0);
+  // servo.write(0);
+  delay(1000);
 }
 
 
@@ -92,8 +93,11 @@ void rotateChassis(int angle) {
   angle *= angleCoefficient;
   currentAngle += angle;
   servo.write(currentAngle);
-  delay(100);
+  Serial.print("Current Angle: ");
+  Serial.println(currentAngle);
+  delay(1000);
   if (currentAngle == ANGLE_MAX) {
+    currentAngle *= angle * -1;
     // Set so motor will wait for rotatePeriod to pass
     rotateTimer++;
   }
