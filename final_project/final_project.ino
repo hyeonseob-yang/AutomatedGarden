@@ -9,13 +9,13 @@
 #include <arduino-timer.h>
 
 const int moisturePin = 0;
-const int DRY = 500;
-const int WET = 400;
+const int DRY = 1023;
+const int WET = 0;
 const int MOISTURE_CUTOFF = 50;
 
 const int lightPin = 1;
-const int DARK = 5;
-const int LIGHT = 135;
+const int DARK = 130;
+const int LIGHT = 650;
 const int MID_LIGHT = (DARK + LIGHT) / 2;
 int lightTime = 0;
 int totalTime = 0;
@@ -64,20 +64,20 @@ void loop() {
 
 void collectData() {
   int moisture = getMoisture();
-  int humidity = getHumidity(moisture);
+  float humidity = getHumidity(moisture);
   int light = getLight();
   if (isBright(light)) {
     lightTime++;
   }
   totalTime++;
-  int lightPercent = (float) lightTime / totalTime * PERCENT;
+  float lightPercent = (float) lightTime / totalTime * PERCENT;
   float temp = getTemp();
   printData(moisture, humidity, light, lightPercent, temp, waterTimer.ticks());
 }
 
 void checkWater() {
   int moisture = getMoisture();
-  int humidity = getHumidity(moisture);
+  float humidity = getHumidity(moisture);
   if (!isWet(humidity)) {
     water();
   }
@@ -118,12 +118,12 @@ int getMoisture() {
   
 }
 
-int getHumidity(int moistureVal) {
-  int humidity = (float)(DRY - moistureVal) / (float)(DRY - WET) * PERCENT;
+float getHumidity(int moistureVal) {
+  float humidity = (float)(DRY - moistureVal) / (float)(DRY - WET) * PERCENT;
   return humidity;
 }
 
-bool isWet(int humidity) {
+bool isWet(float humidity) {
   return humidity > MOISTURE_CUTOFF;
 }
 
@@ -133,7 +133,7 @@ int getLight() {
 }
 
 int isBright(int light) {
-  return light < MID_LIGHT;
+  return light > MID_LIGHT;
 }
 
 float getTemp() {
@@ -143,7 +143,8 @@ float getTemp() {
   return temp;
 }
 
-void printData(int moisture, int humidity, int light, int lightPercent, float temp, int timerTick) {
+void printData(int moisture, float humidity, int light, float lightPercent, float temp, int timerTick) {
+  Serial.println("!");
   Serial.print("aaa");
   Serial.print(moisture);
   Serial.println("aaa");
@@ -162,5 +163,5 @@ void printData(int moisture, int humidity, int light, int lightPercent, float te
   Serial.print("fff");
   Serial.print(timerTick);
   Serial.println("fff");
-  Serial.println("&");
+  Serial.print("&");
 }

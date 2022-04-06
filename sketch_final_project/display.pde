@@ -2,70 +2,88 @@ import processing.serial.*;
 
 Serial myPort;
 
-int moisture_val;
-int light_val;
-int temp_val;
 PFont font;
 
-byte[] inBuffer = new byte[36]; //increase this number if issue is "buffer to small to ..."
 
 void setup(){
-  size(500,400);
+  size(1000,1000);
   frameRate(10);
   printArray(Serial.list());
   String port = Serial.list()[2]; // <-- make sure its the right port
   myPort = new Serial(this, port, 9600);
+  // if ur missing the font, on Processing, go to Tools tab, Create Font, and then find Consolas, size=48
+  font = loadFont("Consolas-48.vlw");
+  textFont(font);
+  textSize(16);
 }
 
-void draw(){
+void draw(){ //<>//
   if (0 < myPort.available()){
+    byte[] inBuffer = new byte[96]; //increase this number if issue is "buffer to small to ..."
     myPort.readBytesUntil('&', inBuffer);
-    if (inBuffer !=null){
-      String myString = new String(inBuffer);
-      String[] p = splitTokens(myString, "&");
-      String[] moisture_sensor = splitTokens(p[0], "aaa");
-      moisture_val = int(moisture_sensor[1]);
-      print("Moisture: "); // the prints are here just for testing
-      print(moisture_val);
-      println("%");
-      
-      String[] light_sensor = splitTokens(p[0], "bbb");
-      light_val = int(light_sensor[1]);
-      print("Light: "); // the prints are here just for testing
-      print(light_val);
-      println(" ");
-      
-      String[] temp_sensor = splitTokens(p[0], "ccc");
-      temp_val = int(temp_sensor[1]);
-      print("Temperature: "); // the prints are here just for testing
-      print(temp_val);
-      println(" C");
-      
-      //example display thing
-      background(220);
-      noFill();
-      stroke(0);
-      strokeWeight(10);
-      rect(20,75,460,75);
-      rect(20,225,460,75);
-      
-      //kinda like a health bar, not sure what to have for the temperature
-      float a = map(moisture_val, 0, 100, 0, 450); // change the first and second number maybe for other displays
-      noStroke();
-      fill(0,0,205);
-      rect(25,80,a,65);
-      
-      float b = map(light_val, 0, 100, 0, 450);
-      fill(255);
-      rect(25,231,b,64);
-       // if ur missing the font, on Processing, go to Tools tab, Create Font, and then find Consolas, size=48
-      font = loadFont("Consolas-48.vlw");
-      fill(0);
-      textFont(font);
-      textSize(32);
-      text("Moisture: " + a + "%", 20, 45);
-      text("Light Exposure: " + light_val + "%", 20, 200);
-      text("Temperature: " + temp_val + "C", 20, 350);
+    String dataString = new String(inBuffer);
+    if (!dataString.trim().isEmpty()) {
+      println("New"); //<>//
+      println(new String(inBuffer));
+      int moistureVal = (int)getValue(dataString, "aaa");
+      float humidity = getValue(dataString, "bbb");
+      int lightVal = (int)getValue(dataString, "ccc");
+      float lightPercent = getValue(dataString, "ddd");
+      float temp = getValue(dataString, "eee");
+      int timeLeft = (int)getValue(dataString, "fff");
+      drawBackground();
+      drawMoistureInfo(moistureVal, humidity);
+      drawLightInfo(lightVal, lightPercent);
+      drawTempInfo(temp);
+      drawTimeLeft(timeLeft);
     }
   }
+}
+
+void drawBackground() {
+  //example display thing
+  background(220);
+}
+
+void drawMoistureInfo(int moistureVal, float humidity) {
+  fill(0);
+  text("Moisture Value: " + moistureVal, 20, 45);
+  text("Humidity: " + humidity + "%", 20, 65);
+  drawBar(20, 80, humidity);
+}
+
+void drawLightInfo(int lightVal, float lightPercent) {
+  fill(0);
+  text("Light Value: " + lightVal, 20, 200);
+  text("Light Exposure: " + lightPercent + "%", 20, 220);
+  drawBar(20, 225, lightPercent);
+}
+
+void drawTempInfo(float temp) {
+  fill(0);
+  text("Temperature: " + temp + "C", 20, 350);
+}
+
+void drawTimeLeft(int timeLeft) {
+  fill(0);
+  int secondsLeft = timeLeft / 1000;
+  text("Seconds Until Water: " + secondsLeft, 20, 450);
+}
+
+void drawBar(int x, int y, float percent) {
+  float a = map(percent, 0, 100, 0, 460);
+  stroke(0);
+  strokeWeight(1);
+  noFill();
+  rect(x, y, 460, 75);
+  noStroke();
+  fill(0, 0, 205);
+  rect(x, y, a, 75);
+}
+
+float getValue(String dataString, String wrapping) { //<>//
+  String[] tokens = splitTokens(dataString, "&"); //<>//
+  String[] values = splitTokens(tokens[0], wrapping);
+  float value = Float.valueOf(values[1]); //<>// //<>// //<>//
+  return value;
 }
