@@ -13,7 +13,7 @@ void setup(){
   size(500,400);
   frameRate(10);
   printArray(Serial.list());
-  String port = Serial.list()[0]; // <-- make sure its the right port
+  String port = Serial.list()[2]; // <-- make sure its the right port
   myPort = new Serial(this, port, 9600);
 }
 

@@ -6,13 +6,14 @@
  *  Servo Motor: https://docs.arduino.cc/learn/electronics/servo-motors
  */
 #include <Servo.h>
+#include <arduino-timer.h>
 
-int moisturePin = 0;
+const int moisturePin = 0;
 const int DRY = 500;
 const int WET = 400;
 const int MOISTURE_CUTOFF = 50;
 
-int lightPin = 1;
+const int lightPin = 1;
 const int DARK = 5;
 const int LIGHT = 135;
 const int MID_LIGHT = (DARK + LIGHT) / 2;
@@ -20,13 +21,16 @@ int lightTime = 0;
 int totalTime = 0;
 const int PERCENT = 100;
 
-int tempPin = 2;
+const int tempPin = 2;
 const int MAX_MILLIVOLTS = 5000;
 const int TEMP_CONSTANT = 500;
 const int TEMP_COEFFICIENT = 10;
 const int ANALOG_INPUT_MAX = 1023;
 
-int pumpPin = 7;
+const int DATA_TIME = 1000;
+auto dataTimer = timer_create_default();
+
+const int pumpPin = 7;
 const int WATER_TIME = 1000;
 
 Servo servo;
@@ -37,8 +41,8 @@ const int FIXED_ROTATION = 30;
 const int ANGLE_MAX = 180;
 const int ANALOG_OUTPUT_MAX = 255;
 // Time in seconds to wait before rotating again
-const int rotatePeriod = 5;
-int rotateTimer = 0;
+int checkWaterTime = 5000;
+auto waterTimer = timer_create_default();
 const int NUM_STEPS = 7;
 
 void setup() {
@@ -48,11 +52,19 @@ void setup() {
   servo.write(0);
   // Wait for motor to get into starting position
   delay(1000);
+  // Have to use timer.in over timer.every because water process is blocking code
+  waterTimer.in(checkWaterTime, checkWater);
+  dataTimer.every(DATA_TIME, collectData);
 }
 
 void loop() {
-  delay(WATER_TIME);
-  int humidity = getMoisture();
+  waterTimer.tick();
+  dataTimer.tick();
+}
+
+void collectData() {
+  int moisture = getMoisture();
+  int humidity = getHumidity(moisture);
   int light = getLight();
   if (isBright(light)) {
     lightTime++;
@@ -60,23 +72,17 @@ void loop() {
   totalTime++;
   int lightPercent = (float) lightTime / totalTime * PERCENT;
   float temp = getTemp();
-  printData(humidity, lightPercent, temp);
-
-  bool willRotate = shouldRotate();
-  if (willRotate) {
-    if (!isWet(humidity)) {
-      water();
-    }
-  } else {
-    rotateTimer++;
-  }
-  
+  printData(moisture, humidity, light, lightPercent, temp, waterTimer.ticks());
 }
 
-bool shouldRotate() {
-  // Use + 1 because rotate code will increment once
-  bool willRotate = rotateTimer % (rotatePeriod + 1) <= 0;
-  return willRotate;
+void checkWater() {
+  int moisture = getMoisture();
+  int humidity = getHumidity(moisture);
+  if (!isWet(humidity)) {
+    water();
+  }
+  // Start another timer to check when to water after watering process is done
+  waterTimer.in(checkWaterTime, checkWater);
 }
 
 void water() {
@@ -84,8 +90,6 @@ void water() {
     pumpWater();
     rotateChassis(FIXED_ROTATION);
   }
-  // servo.write(0);
-  delay(1000);
 }
 
 
@@ -93,34 +97,33 @@ void rotateChassis(int angle) {
   angle *= angleCoefficient;
   currentAngle += angle;
   servo.write(currentAngle);
-  Serial.print("Current Angle: ");
-  Serial.println(currentAngle);
   delay(1000);
+  collectData();
   if (currentAngle == ANGLE_MAX) {
-    currentAngle *= angle * -1;
-    // Set so motor will wait for rotatePeriod to pass
-    rotateTimer++;
+    currentAngle = angle * -1;
   }
 }
 
 void pumpWater() {
   digitalWrite(pumpPin, HIGH);
-  delay(1000);
+  delay(500);
   digitalWrite(pumpPin, LOW);
-  delay(1000);
+  delay(500);
+  collectData();
 }
 
 int getMoisture() {
   int moistureVal = analogRead(moisturePin);
-  Serial.print("Moisture: ");
-  Serial.println(moistureVal);
-  int percentageHumidity = (float)(DRY - moistureVal) / (float)(DRY - WET) * PERCENT;
-  return percentageHumidity;
+  return moistureVal;
+  
+}
+
+int getHumidity(int moistureVal) {
+  int humidity = (float)(DRY - moistureVal) / (float)(DRY - WET) * PERCENT;
+  return humidity;
 }
 
 bool isWet(int humidity) {
-  Serial.print("Moisture Cutoff: ");
-  Serial.println(MOISTURE_CUTOFF);
   return humidity > MOISTURE_CUTOFF;
 }
 
@@ -140,15 +143,24 @@ float getTemp() {
   return temp;
 }
 
-void printData(int humidity, int lightPercent, float temp) {
+void printData(int moisture, int humidity, int light, int lightPercent, float temp, int timerTick) {
   Serial.print("aaa");
-  Serial.print(humidity);
+  Serial.print(moisture);
   Serial.println("aaa");
   Serial.print("bbb");
-  Serial.print(lightPercent);
+  Serial.print(humidity);
   Serial.println("bbb");
   Serial.print("ccc");
-  Serial.print(temp);
+  Serial.print(light);
   Serial.println("ccc");
-  Serial.print("&");
+  Serial.print("ddd");
+  Serial.print(lightPercent);
+  Serial.println("ddd");
+  Serial.print("eee");
+  Serial.print(temp);
+  Serial.println("eee");
+  Serial.print("fff");
+  Serial.print(timerTick);
+  Serial.println("fff");
+  Serial.println("&");
 }
