@@ -3,6 +3,7 @@ import processing.serial.*;
 Serial myPort;
 
 PFont font;
+Button waterButton = new Button(600, 600, "Water");
 
 
 void setup(){
@@ -38,6 +39,14 @@ void draw(){ //<>//
       drawTimeLeft(timeLeft);
     }
   }
+  waterButton.draw();
+}
+
+void mouseReleased() {
+  if (waterButton.isOver()) {
+    String msg = "1\r\n";
+    myPort.write(msg);
+  }
 }
 
 void drawBackground() {
@@ -47,6 +56,7 @@ void drawBackground() {
 
 void drawMoistureInfo(int moistureVal, float humidity) {
   fill(0);
+  textAlign(LEFT, TOP);
   text("Moisture Value: " + moistureVal, 20, 45);
   text("Humidity: " + humidity + "%", 20, 65);
   drawBar(20, 80, humidity);
@@ -54,19 +64,22 @@ void drawMoistureInfo(int moistureVal, float humidity) {
 
 void drawLightInfo(int lightVal, float lightPercent) {
   fill(0);
+  textAlign(LEFT, TOP);
   text("Light Value: " + lightVal, 20, 200);
   text("Light Exposure: " + lightPercent + "%", 20, 220);
-  drawBar(20, 225, lightPercent);
+  drawBar(20, 235, lightPercent);
 }
 
 void drawTempInfo(float temp) {
   fill(0);
+  textAlign(LEFT, TOP);
   text("Temperature: " + temp + "C", 20, 350);
 }
 
 void drawTimeLeft(int timeLeft) {
   fill(0);
   int secondsLeft = timeLeft / 1000;
+  textAlign(LEFT, TOP);
   text("Seconds Until Water: " + secondsLeft, 20, 450);
 }
 

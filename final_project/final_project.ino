@@ -41,7 +41,7 @@ const int FIXED_ROTATION = 30;
 const int ANGLE_MAX = 180;
 const int ANALOG_OUTPUT_MAX = 255;
 // Time in seconds to wait before rotating again
-int checkWaterTime = 5000;
+unsigned long checkWaterTime = 5000;
 auto waterTimer = timer_create_default();
 const int NUM_STEPS = 7;
 
@@ -60,6 +60,13 @@ void setup() {
 void loop() {
   waterTimer.tick();
   dataTimer.tick();
+  if (Serial.available() > 0) {
+    String data = Serial.readStringUntil('\r\n');
+    bool isWater = (bool)data.substring(0, data.length() - 2);
+    if (isWater) {
+      water();
+    }
+  }
 }
 
 void collectData() {
@@ -81,6 +88,7 @@ void checkWater() {
   if (!isWet(humidity)) {
     water();
   }
+  
   // Start another timer to check when to water after watering process is done
   waterTimer.in(checkWaterTime, checkWater);
 }
@@ -143,7 +151,7 @@ float getTemp() {
   return temp;
 }
 
-void printData(int moisture, float humidity, int light, float lightPercent, float temp, int timerTick) {
+void printData(int moisture, float humidity, int light, float lightPercent, float temp, unsigned long timerTick) {
   Serial.println("!");
   Serial.print("aaa");
   Serial.print(moisture);
