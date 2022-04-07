@@ -11,12 +11,12 @@
 const int moisturePin = 0;
 const int DRY = 1023;
 const int WET = 0;
-const int MOISTURE_CUTOFF = 50;
+int moistureCutoff = (DRY + WET) / 2;
 
 const int lightPin = 1;
 const int DARK = 130;
 const int LIGHT = 650;
-const int MID_LIGHT = (DARK + LIGHT) / 2;
+int lightCutoff = (DARK + LIGHT) / 2;
 int lightTime = 0;
 int totalTime = 0;
 const int PERCENT = 100;
@@ -84,8 +84,7 @@ void collectData() {
 
 void checkWater() {
   int moisture = getMoisture();
-  float humidity = getHumidity(moisture);
-  if (!isWet(humidity)) {
+  if (!isWet(moisture)) {
     water();
   }
   
@@ -131,8 +130,8 @@ float getHumidity(int moistureVal) {
   return humidity;
 }
 
-bool isWet(float humidity) {
-  return humidity > MOISTURE_CUTOFF;
+bool isWet(int moisture) {
+  return moisture > moistureCutoff;
 }
 
 int getLight() {
@@ -141,7 +140,7 @@ int getLight() {
 }
 
 int isBright(int light) {
-  return light > MID_LIGHT;
+  return light > lightCutoff;
 }
 
 float getTemp() {
@@ -160,16 +159,22 @@ void printData(int moisture, float humidity, int light, float lightPercent, floa
   Serial.print(humidity);
   Serial.println("bbb");
   Serial.print("ccc");
-  Serial.print(light);
+  Serial.print(moistureCutoff);
   Serial.println("ccc");
   Serial.print("ddd");
-  Serial.print(lightPercent);
+  Serial.print(light);
   Serial.println("ddd");
   Serial.print("eee");
-  Serial.print(temp);
+  Serial.print(lightPercent);
   Serial.println("eee");
   Serial.print("fff");
-  Serial.print(timerTick);
+  Serial.print(lightCutoff);
   Serial.println("fff");
+  Serial.print("ggg");
+  Serial.print(temp);
+  Serial.println("ggg");
+  Serial.print("hhh");
+  Serial.print(timerTick);
+  Serial.println("hhh");
   Serial.print("&");
 }

@@ -20,7 +20,7 @@ void setup(){
 
 void draw(){ //<>//
   if (0 < myPort.available()){
-    byte[] inBuffer = new byte[96]; //increase this number if issue is "buffer to small to ..."
+    byte[] inBuffer = new byte[255]; //increase this number if issue is "buffer to small to ..."
     myPort.readBytesUntil('&', inBuffer);
     String dataString = new String(inBuffer);
     if (!dataString.trim().isEmpty()) {
@@ -28,13 +28,15 @@ void draw(){ //<>//
       println(new String(inBuffer));
       int moistureVal = (int)getValue(dataString, "aaa");
       float humidity = getValue(dataString, "bbb");
-      int lightVal = (int)getValue(dataString, "ccc");
-      float lightPercent = getValue(dataString, "ddd");
-      float temp = getValue(dataString, "eee");
-      int timeLeft = (int)getValue(dataString, "fff");
+      int moistureCutoff = (int)getValue(dataString, "ccc");
+      int lightVal = (int)getValue(dataString, "ddd");
+      float lightPercent = getValue(dataString, "eee");
+      int lightCutoff = (int)getValue(dataString, "fff");
+      float temp = getValue(dataString, "ggg");
+      int timeLeft = (int)getValue(dataString, "hhh");
       drawBackground();
-      drawMoistureInfo(moistureVal, humidity);
-      drawLightInfo(lightVal, lightPercent);
+      drawMoistureInfo(moistureVal, humidity, moistureCutoff);
+      drawLightInfo(lightVal, lightPercent, lightCutoff);
       drawTempInfo(temp);
       drawTimeLeft(timeLeft);
     }
@@ -54,20 +56,22 @@ void drawBackground() {
   background(220);
 }
 
-void drawMoistureInfo(int moistureVal, float humidity) {
+void drawMoistureInfo(int moistureVal, float humidity, int moistureCutoff) {
   fill(0);
   textAlign(LEFT, TOP);
   text("Moisture Value: " + moistureVal, 20, 45);
   text("Humidity: " + humidity + "%", 20, 65);
-  drawBar(20, 80, humidity);
+  text("Light Cutoff: " + moistureCutoff, 20, 85);
+  drawBar(20, 100, humidity);
 }
 
-void drawLightInfo(int lightVal, float lightPercent) {
+void drawLightInfo(int lightVal, float lightPercent, int lightCutoff) {
   fill(0);
   textAlign(LEFT, TOP);
   text("Light Value: " + lightVal, 20, 200);
   text("Light Exposure: " + lightPercent + "%", 20, 220);
-  drawBar(20, 235, lightPercent);
+  text("Light Cutoff: " + lightCutoff, 20, 240);
+  drawBar(20, 255, lightPercent);
 }
 
 void drawTempInfo(float temp) {
