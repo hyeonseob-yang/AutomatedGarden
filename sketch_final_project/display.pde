@@ -27,7 +27,7 @@ void setup(){
 // Reads input and draws elements
 void draw(){ //<>//
   if (0 < myPort.available()){
-    byte[] inBuffer = new byte[255]; //increase this number if issue is "buffer to small to ..."
+    byte[] inBuffer = new byte[256]; //increase this number if issue is "buffer to small to ..."
     myPort.readBytesUntil('&', inBuffer);
     String dataString = new String(inBuffer);
     if (!dataString.trim().isEmpty()) {
@@ -54,11 +54,11 @@ void draw(){ //<>//
 // Checks if buttons are pressed
 void mouseReleased() {
   if (waterButton.isOver()) {
-    String msg = "1\r\n";
+    String msg = "aaa1aaabbb50bbbccc50cccddd50000ddd\r\n";
     myPort.write(msg);
   }
   if (updateButton.isOver()) {
-    String msg = "aaa0aaabbb30bbb";
+    String msg = "aaa0aaabbb50bbbccc50cccddd50000ddd\r\n";
     myPort.write(msg);
   }
 }

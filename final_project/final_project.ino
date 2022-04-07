@@ -63,12 +63,24 @@ void loop() {
   waterTimer.tick();
   dataTimer.tick();
   if (Serial.available() > 0) {
-    String data = Serial.readStringUntil('\r\n');
-    bool isWater = (bool)data.substring(0, data.length() - 2);
+    String data = Serial.readStringUntil("\r\n");
+    String dataString = getValue(data, "aaa");
+    bool isWater = dataString == "1";
+    moistureCutoff = getValue(data, "bbb").toInt();
+    lightCutoff = getValue(data, "ccc").toInt();
+    checkWaterTime = strtoul(getValue(data, "ddd").c_str(), NULL, 10) * 1000;
     if (isWater) {
-      water();
+       water();
     }
   }
+}
+
+String getValue(String data, String separator) {
+  int firstIndex = data.indexOf(separator) + separator.length();
+  String unwrapped = data.substring(firstIndex, data.length() - 1);
+  int secondIndex = unwrapped.indexOf(separator) + firstIndex;
+  String value = data.substring(firstIndex, secondIndex);
+  return value;
 }
 
 // Collects data from sensors and prints to serial monitor
@@ -140,7 +152,7 @@ float getHumidity(int moistureVal) {
 
 // Returns true if wet
 bool isWet(int moisture) {
-  return moisture > moistureCutoff;
+  return moisture < moistureCutoff;
 }
 
 // Gets light value from photoresistor
