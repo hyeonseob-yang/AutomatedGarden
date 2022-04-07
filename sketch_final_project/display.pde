@@ -1,11 +1,17 @@
+/* References:
+/ Button: https://processing.org/examples/button.html
+*/
+
 import processing.serial.*;
 
 Serial myPort;
 
 PFont font;
+Button updateButton = new Button(500, 600, "Update");
 Button waterButton = new Button(600, 600, "Water");
 
 
+// Sets up screen and serial monitor
 void setup(){
   size(1000,1000);
   frameRate(10);
@@ -18,6 +24,7 @@ void setup(){
   textSize(16);
 }
 
+// Reads input and draws elements
 void draw(){ //<>//
   if (0 < myPort.available()){
     byte[] inBuffer = new byte[255]; //increase this number if issue is "buffer to small to ..."
@@ -44,27 +51,35 @@ void draw(){ //<>//
   waterButton.draw();
 }
 
+// Checks if buttons are pressed
 void mouseReleased() {
   if (waterButton.isOver()) {
     String msg = "1\r\n";
     myPort.write(msg);
   }
+  if (updateButton.isOver()) {
+    String msg = "aaa0aaabbb30bbb";
+    myPort.write(msg);
+  }
 }
 
+// Draws background
 void drawBackground() {
   //example display thing
   background(220);
 }
 
+// Draws info related to soil moisture sensor
 void drawMoistureInfo(int moistureVal, float humidity, int moistureCutoff) {
   fill(0);
   textAlign(LEFT, TOP);
   text("Moisture Value: " + moistureVal, 20, 45);
   text("Humidity: " + humidity + "%", 20, 65);
-  text("Light Cutoff: " + moistureCutoff, 20, 85);
+  text("Moisture Cutoff: " + moistureCutoff, 20, 85);
   drawBar(20, 100, humidity);
 }
 
+// Draws info related to photoresistor
 void drawLightInfo(int lightVal, float lightPercent, int lightCutoff) {
   fill(0);
   textAlign(LEFT, TOP);
@@ -74,12 +89,14 @@ void drawLightInfo(int lightVal, float lightPercent, int lightCutoff) {
   drawBar(20, 255, lightPercent);
 }
 
+// Draws info related to temperature sensor
 void drawTempInfo(float temp) {
   fill(0);
   textAlign(LEFT, TOP);
   text("Temperature: " + temp + "C", 20, 350);
 }
 
+// Draws time left on water timer
 void drawTimeLeft(int timeLeft) {
   fill(0);
   int secondsLeft = timeLeft / 1000;
@@ -87,6 +104,7 @@ void drawTimeLeft(int timeLeft) {
   text("Seconds Until Water: " + secondsLeft, 20, 450);
 }
 
+// Draws bar that displays percents graphically
 void drawBar(int x, int y, float percent) {
   float a = map(percent, 0, 100, 0, 460);
   stroke(0);
@@ -98,6 +116,7 @@ void drawBar(int x, int y, float percent) {
   rect(x, y, a, 75);
 }
 
+// Gets value from serial input and processes
 float getValue(String dataString, String wrapping) { //<>//
   String[] tokens = splitTokens(dataString, "&"); //<>//
   String[] values = splitTokens(tokens[0], wrapping);

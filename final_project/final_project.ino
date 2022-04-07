@@ -45,6 +45,7 @@ unsigned long checkWaterTime = 5000;
 auto waterTimer = timer_create_default();
 const int NUM_STEPS = 7;
 
+// Sets up serial monitor, pins, and timers
 void setup() {
   Serial.begin(9600);
   pinMode(pumpPin, OUTPUT);
@@ -57,6 +58,7 @@ void setup() {
   dataTimer.every(DATA_TIME, collectData);
 }
 
+// Ticks timers and checks for input
 void loop() {
   waterTimer.tick();
   dataTimer.tick();
@@ -69,6 +71,7 @@ void loop() {
   }
 }
 
+// Collects data from sensors and prints to serial monitor
 void collectData() {
   int moisture = getMoisture();
   float humidity = getHumidity(moisture);
@@ -82,6 +85,7 @@ void collectData() {
   printData(moisture, humidity, light, lightPercent, temp, waterTimer.ticks());
 }
 
+// Checks if soil is dry and waters if dry
 void checkWater() {
   int moisture = getMoisture();
   if (!isWet(moisture)) {
@@ -92,6 +96,7 @@ void checkWater() {
   waterTimer.in(checkWaterTime, checkWater);
 }
 
+// Waters soil
 void water() {
   for (int i=0; i < NUM_STEPS; i++) {
     pumpWater();
@@ -99,7 +104,7 @@ void water() {
   }
 }
 
-
+// Uses servomotor to rotate water tank
 void rotateChassis(int angle) {
   angle *= angleCoefficient;
   currentAngle += angle;
@@ -111,6 +116,7 @@ void rotateChassis(int angle) {
   }
 }
 
+// Pumps water through piping
 void pumpWater() {
   digitalWrite(pumpPin, HIGH);
   delay(500);
@@ -119,30 +125,36 @@ void pumpWater() {
   collectData();
 }
 
+// Gets the moisture value from the soil moisture sensor
 int getMoisture() {
   int moistureVal = analogRead(moisturePin);
   return moistureVal;
   
 }
 
+// Converts the moisture value to a humidity percentage
 float getHumidity(int moistureVal) {
   float humidity = (float)(DRY - moistureVal) / (float)(DRY - WET) * PERCENT;
   return humidity;
 }
 
+// Returns true if wet
 bool isWet(int moisture) {
   return moisture > moistureCutoff;
 }
 
+// Gets light value from photoresistor
 int getLight() {
   int lightVal = analogRead(lightPin);
   return lightVal;
 }
 
+// Returns true if bright
 int isBright(int light) {
   return light > lightCutoff;
 }
 
+// Gets the temperature from the temperature sensor
 float getTemp() {
   // ACCURACY OF TEMP SENSOR HAS A VARIANCE OF ABOUT 4 C
   int tempVal = analogRead(tempPin);
@@ -150,6 +162,7 @@ float getTemp() {
   return temp;
 }
 
+// Prints all sensor data and other values to serial monitor
 void printData(int moisture, float humidity, int light, float lightPercent, float temp, unsigned long timerTick) {
   Serial.println("!");
   Serial.print("aaa");
