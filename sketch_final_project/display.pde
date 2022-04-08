@@ -12,8 +12,8 @@ int FIELD_HEIGHT = 40;
 Serial myPort;
 
 PFont font;
-Button updateButton = new Button(680, 600, "Update");
-Button waterButton = new Button(800, 600, "Water");
+Button updateButton = new Button(680, 800, "Update");
+Button waterButton = new Button(800, 800, "Water");
 
 int moistureCutoff;
 int lightCutoff;
@@ -56,13 +56,13 @@ void addTextField(int x, int y, String name, String label, Boolean focus) {
 
 // Reads input and draws elements
 void draw(){ //<>//
-  textSize(48);
-  textAlign(CENTER);
-  fill(255);
-  text("Automated Garden", width / 2, 100);
-  translate(0, 200);
-  textSize(16);
   if (0 < myPort.available()){
+    background(color(20, 150, 200));
+    textSize(48);
+    textAlign(CENTER);
+    fill(255);
+    text("Automated Garden", width / 2, 100);
+    textSize(16);
     byte[] inBuffer = new byte[256]; //increase this number if issue is "buffer to small to ..."
     myPort.readBytesUntil('&', inBuffer);
     String dataString = new String(inBuffer);
@@ -83,11 +83,11 @@ void draw(){ //<>//
       drawLightInfo(lightVal, lightPercent, lightCutoff);
       drawTempInfo(temp);
       drawTime(timeLeft);
+      waterButton.draw();
+      updateButton.draw();
     }
   }
-  waterButton.draw();
-  updateButton.draw();
-  translate(0, -200);
+  
 }
 
 // Checks if buttons are pressed
@@ -129,38 +129,38 @@ void drawBackground() {
 
 // Draws info related to soil moisture sensor
 void drawMoistureInfo(int moistureVal, float humidity, int moistureCutoff) {
-  fill(0);
+  fill(255);
   textAlign(LEFT, TOP);
-  text("Moisture Value: " + moistureVal, 20, 45);
-  text("Humidity: " + humidity + "%", 20, 65);
-  text("Moisture Cutoff: " + moistureCutoff, 20, 85);
+  text("Moisture Value: " + moistureVal, 20, 245);
+  text("Humidity: " + humidity + "%", 20, 265);
+  text("Moisture Cutoff: " + moistureCutoff, 20, 285);
   drawBar(20, 100, humidity);
 }
 
 // Draws info related to photoresistor
 void drawLightInfo(int lightVal, float lightPercent, int lightCutoff) {
-  fill(0);
+  fill(255);
   textAlign(LEFT, TOP);
-  text("Light Value: " + lightVal, 20, 200);
-  text("Light Exposure: " + lightPercent + "%", 20, 220);
-  text("Light Cutoff: " + lightCutoff, 20, 240);
+  text("Light Value: " + lightVal, 20, 400);
+  text("Light Exposure: " + lightPercent + "%", 20, 420);
+  text("Light Cutoff: " + lightCutoff, 20, 440);
   drawBar(20, 255, lightPercent);
 }
 
 // Draws info related to temperature sensor
 void drawTempInfo(float temp) {
-  fill(0);
+  fill(255);
   textAlign(LEFT, TOP);
-  text("Temperature: " + temp + "C", 20, 350);
+  text("Temperature: " + temp + "C", 20, 550);
 }
 
 // Draws time left on water timer
 void drawTime(int timeLeft) {
-  fill(0);
+  fill(255);
   int secondsLeft = timeLeft / 1000;
   textAlign(LEFT, TOP);
-  text("Seconds Until Water: " + secondsLeft, 20, 450);
-  text("Seconds Between Cycles: " + maxTime, 20, 470);
+  text("Seconds Until Water: " + secondsLeft, 20, 650);
+  text("Seconds Between Cycles: " + maxTime, 20, 670);
 }
 
 // Draws bar that displays percents graphically

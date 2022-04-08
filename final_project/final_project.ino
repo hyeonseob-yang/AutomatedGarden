@@ -31,7 +31,7 @@ const int DATA_TIME = 1000;
 auto dataTimer = timer_create_default();
 
 const int pumpPin = 7;
-const int WATER_TIME = 1000;
+const int WATER_TIME = 100;
 
 Servo servo;
 int motorPin = 9;
@@ -131,9 +131,9 @@ void rotateChassis(int angle) {
 // Pumps water through piping
 void pumpWater() {
   digitalWrite(pumpPin, HIGH);
-  delay(500);
+  delay(WATER_TIME);
   digitalWrite(pumpPin, LOW);
-  delay(500);
+  delay(WATER_TIME);
   collectData();
 }
 
