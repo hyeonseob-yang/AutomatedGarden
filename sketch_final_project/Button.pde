@@ -3,8 +3,8 @@ class Button {
   int y;
   String text;
   
-  int bWidth = 50;
-  int bHeight = 50;
+  int bWidth = 100;
+  int bHeight = 40;
   int margin = 5;
   
   color regular = color(50, 50, 50);

@@ -3,63 +3,105 @@
 */
 
 import processing.serial.*;
+import controlP5.*;
+
+ControlP5 p5;
+int FIELD_WIDTH = 200;
+int FIELD_HEIGHT = 40;
 
 Serial myPort;
 
 PFont font;
-Button updateButton = new Button(500, 600, "Update");
-Button waterButton = new Button(600, 600, "Water");
+Button updateButton = new Button(680, 600, "Update");
+Button waterButton = new Button(800, 600, "Water");
+
+int moistureCutoff;
+int lightCutoff;
+int timeLeft;
+String moistureCutoffField = "moistureCutoff";
+String lightCutoffField = "lightCutoff";
+String timerField = "timer";
 
 
 // Sets up screen and serial monitor
 void setup(){
   size(1000,1000);
   frameRate(10);
-  printArray(Serial.list());
-  String port = Serial.list()[2]; // <-- make sure its the right port
-  myPort = new Serial(this, port, 9600);
+  //printArray(Serial.list());
+  //String port = Serial.list()[2]; // <-- make sure its the right port
+  //myPort = new Serial(this, port, 9600);
+  
   // if ur missing the font, on Processing, go to Tools tab, Create Font, and then find Consolas, size=48
   font = loadFont("Consolas-48.vlw");
   textFont(font);
   textSize(16);
+  
+  p5 = new ControlP5(this);
+  addTextField(20, 600, moistureCutoffField, "Moisture Cutoff: ", true);
+  addTextField(240, 600, lightCutoffField, "Light Cutoff: ", false);
+  addTextField(460, 600, timerField, "Timer: ", false); 
+}
+
+void addTextField(int x, int y, String name, String label, Boolean focus) {
+  Textfield m = p5.addTextfield(name).setPosition(x, y).setSize(FIELD_WIDTH, FIELD_HEIGHT).setColor(0).setColorBackground(color(255,255,255)).setFocus(focus);
+  m.setText("");
+  Label mLabel = m.getCaptionLabel();
+  mLabel.setText(label);
+  mLabel.align(LEFT, ControlP5.TOP_OUTSIDE);
+  mLabel.setColor(color(0, 0, 0));
 }
 
 // Reads input and draws elements
 void draw(){ //<>//
-  if (0 < myPort.available()){
-    byte[] inBuffer = new byte[256]; //increase this number if issue is "buffer to small to ..."
-    myPort.readBytesUntil('&', inBuffer);
-    String dataString = new String(inBuffer);
-    if (!dataString.trim().isEmpty()) {
-      println("New"); //<>//
-      println(new String(inBuffer));
-      int moistureVal = (int)getValue(dataString, "aaa");
-      float humidity = getValue(dataString, "bbb");
-      int moistureCutoff = (int)getValue(dataString, "ccc");
-      int lightVal = (int)getValue(dataString, "ddd");
-      float lightPercent = getValue(dataString, "eee");
-      int lightCutoff = (int)getValue(dataString, "fff");
-      float temp = getValue(dataString, "ggg");
-      int timeLeft = (int)getValue(dataString, "hhh");
-      drawBackground();
-      drawMoistureInfo(moistureVal, humidity, moistureCutoff);
-      drawLightInfo(lightVal, lightPercent, lightCutoff);
-      drawTempInfo(temp);
-      drawTimeLeft(timeLeft);
-    }
-  }
+  //if (0 < myPort.available()){
+  //  byte[] inBuffer = new byte[256]; //increase this number if issue is "buffer to small to ..."
+  //  myPort.readBytesUntil('&', inBuffer);
+  //  String dataString = new String(inBuffer);
+  //  if (!dataString.trim().isEmpty()) {
+  //    println("New"); //<>//
+  //    println(new String(inBuffer));
+  //    int moistureVal = (int)getValue(dataString, "aaa");
+  //    float humidity = getValue(dataString, "bbb");
+  //    moistureCutoff = (int)getValue(dataString, "ccc");
+  //    int lightVal = (int)getValue(dataString, "ddd");
+  //    float lightPercent = getValue(dataString, "eee");
+  //    lightCutoff = (int)getValue(dataString, "fff");
+  //    float temp = getValue(dataString, "ggg");
+  //    timeLeft = (int)getValue(dataString, "hhh");
+  //    drawBackground();
+  //    drawMoistureInfo(moistureVal, humidity, moistureCutoff);
+  //    drawLightInfo(lightVal, lightPercent, lightCutoff);
+  //    drawTempInfo(temp);
+  //    drawTimeLeft(timeLeft);
+  //  }
+  //}
   waterButton.draw();
+  updateButton.draw();
 }
 
 // Checks if buttons are pressed
 void mouseReleased() {
   if (waterButton.isOver()) {
-    String msg = "aaa1aaabbb50bbbccc50cccddd50000ddd\r\n";
-    myPort.write(msg);
+    String msg = "aaa1aaabbb" + moistureCutoff + "bbbccc" + lightCutoff + "cccddd" + 50000 + "ddd\r\n";
+    println(msg);
+    //myPort.write(msg);
   }
   if (updateButton.isOver()) {
-    String msg = "aaa0aaabbb50bbbccc50cccddd50000ddd\r\n";
-    myPort.write(msg);
+    String mCutoff = p5.get(Textfield.class, moistureCutoffField).getText();
+    if (mCutoff.equals("")) {
+      mCutoff = Integer.toString(moistureCutoff);
+    }
+    String lCutoff = p5.get(Textfield.class, lightCutoffField).getText();
+    if (mCutoff.equals("")) {
+      mCutoff = Integer.toString(moistureCutoff);
+    }
+    String t = p5.get(Textfield.class, timerField).getText();
+    if (t.equals("")) {
+      t = Integer.toString(50000);
+    }
+    String msg = "aaa0aaabbb" + mCutoff + "bbbccc" + lCutoff + "cccddd" + t + "ddd\r\n";
+    println(msg);
+    //myPort.write(msg);
   }
 }
 
