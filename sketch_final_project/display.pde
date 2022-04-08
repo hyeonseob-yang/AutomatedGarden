@@ -27,6 +27,7 @@ String timerField = "timer";
 // Sets up screen and serial monitor
 void setup(){
   size(1000,1000);
+  background(color(20, 150, 200));
   frameRate(10);
   printArray(Serial.list());
   String port = Serial.list()[0]; // <-- make sure its the right port
@@ -37,10 +38,11 @@ void setup(){
   textFont(font);
   textSize(16);
   
+  
   p5 = new ControlP5(this);
-  addTextField(20, 600, moistureCutoffField, "Moisture Cutoff: ", true);
-  addTextField(240, 600, lightCutoffField, "Light Cutoff: ", false);
-  addTextField(460, 600, timerField, "Timer: ", false); 
+  addTextField(20, 800, moistureCutoffField, "Moisture Cutoff: ", true);
+  addTextField(240, 800, lightCutoffField, "Light Cutoff: ", false);
+  addTextField(460, 800, timerField, "Timer: ", false); 
 }
 
 void addTextField(int x, int y, String name, String label, Boolean focus) {
@@ -49,11 +51,17 @@ void addTextField(int x, int y, String name, String label, Boolean focus) {
   Label mLabel = m.getCaptionLabel();
   mLabel.setText(label);
   mLabel.align(LEFT, ControlP5.TOP_OUTSIDE);
-  mLabel.setColor(color(0, 0, 0));
+  mLabel.setColor(color(255, 255, 255));
 }
 
 // Reads input and draws elements
 void draw(){ //<>//
+  textSize(48);
+  textAlign(CENTER);
+  fill(255);
+  text("Automated Garden", width / 2, 100);
+  translate(0, 200);
+  textSize(16);
   if (0 < myPort.available()){
     byte[] inBuffer = new byte[256]; //increase this number if issue is "buffer to small to ..."
     myPort.readBytesUntil('&', inBuffer);
@@ -79,6 +87,7 @@ void draw(){ //<>//
   }
   waterButton.draw();
   updateButton.draw();
+  translate(0, -200);
 }
 
 // Checks if buttons are pressed
@@ -159,7 +168,7 @@ void drawBar(int x, int y, float percent) {
   float a = map(percent, 0, 100, 0, 460);
   stroke(0);
   strokeWeight(1);
-  noFill();
+  fill(255);
   rect(x, y, 460, 75);
   noStroke();
   fill(0, 0, 205);
