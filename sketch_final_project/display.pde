@@ -160,7 +160,8 @@ void drawTime(int timeLeft) {
   int secondsLeft = timeLeft / 1000;
   textAlign(LEFT, TOP);
   text("Seconds Until Water: " + secondsLeft, 20, 650);
-  text("Seconds Between Cycles: " + maxTime, 20, 670);
+  int maxSeconds = maxTime / 1000;
+  text("Seconds Between Cycles: " + maxSeconds, 20, 670);
 }
 
 // Draws bar that displays percents graphically
