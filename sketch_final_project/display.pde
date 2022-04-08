@@ -28,9 +28,9 @@ String timerField = "timer";
 void setup(){
   size(1000,1000);
   frameRate(10);
-  //printArray(Serial.list());
-  //String port = Serial.list()[2]; // <-- make sure its the right port
-  //myPort = new Serial(this, port, 9600);
+  printArray(Serial.list());
+  String port = Serial.list()[2]; // <-- make sure its the right port
+  myPort = new Serial(this, port, 9600);
   
   // if ur missing the font, on Processing, go to Tools tab, Create Font, and then find Consolas, size=48
   font = loadFont("Consolas-48.vlw");
@@ -74,7 +74,7 @@ void draw(){ //<>//
       drawMoistureInfo(moistureVal, humidity, moistureCutoff);
       drawLightInfo(lightVal, lightPercent, lightCutoff);
       drawTempInfo(temp);
-      drawTimeLeft(timeLeft);
+      drawTime(timeLeft);
     }
   }
   waterButton.draw();
@@ -146,11 +146,12 @@ void drawTempInfo(float temp) {
 }
 
 // Draws time left on water timer
-void drawTimeLeft(int timeLeft) {
+void drawTime(int timeLeft) {
   fill(0);
   int secondsLeft = timeLeft / 1000;
   textAlign(LEFT, TOP);
   text("Seconds Until Water: " + secondsLeft, 20, 450);
+  text("Seconds Between Cycles: " + maxTime, 20, 470);
 }
 
 // Draws bar that displays percents graphically
