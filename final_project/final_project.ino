@@ -37,13 +37,13 @@ Servo servo;
 int motorPin = 9;
 int currentAngle = 0;
 int angleCoefficient = 1;
+const int NUM_STEPS = 2;
 const int FIXED_ROTATION = 30;
-const int ANGLE_MAX = 180;
+const int ANGLE_MAX = (NUM_STPES - 1) * FIXED_ROTATION;
 const int ANALOG_OUTPUT_MAX = 255;
 // Time in seconds to wait before rotating again
 unsigned long checkWaterTime = 5000;
 auto waterTimer = timer_create_default();
-const int NUM_STEPS = 7;
 
 // Sets up serial monitor, pins, and timers
 void setup() {
