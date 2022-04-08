@@ -49,6 +49,7 @@ auto waterTimer = timer_create_default();
 void setup() {
   Serial.begin(9600);
   pinMode(pumpPin, OUTPUT);
+  digitalWrite(pumpPin, HIGH);
   servo.attach(motorPin);
   servo.write(0);
   // Wait for motor to get into starting position
@@ -130,9 +131,9 @@ void rotateChassis(int angle) {
 
 // Pumps water through piping
 void pumpWater() {
-  digitalWrite(pumpPin, HIGH);
-  delay(WATER_TIME);
   digitalWrite(pumpPin, LOW);
+  delay(WATER_TIME);
+  digitalWrite(pumpPin, HIGH);
   delay(WATER_TIME);
   collectData();
 }
