@@ -201,5 +201,8 @@ void printData(int moisture, float humidity, int light, float lightPercent, floa
   Serial.print("hhh");
   Serial.print(timerTick);
   Serial.println("hhh");
+  Serial.print("iii");
+  Serial.print(checkWaterTime);
+  Serial.println("iii");
   Serial.print("&");
 }

@@ -18,6 +18,7 @@ Button waterButton = new Button(800, 600, "Water");
 int moistureCutoff;
 int lightCutoff;
 int timeLeft;
+int maxTime;
 String moistureCutoffField = "moistureCutoff";
 String lightCutoffField = "lightCutoff";
 String timerField = "timer";
@@ -53,28 +54,29 @@ void addTextField(int x, int y, String name, String label, Boolean focus) {
 
 // Reads input and draws elements
 void draw(){ //<>//
-  //if (0 < myPort.available()){
-  //  byte[] inBuffer = new byte[256]; //increase this number if issue is "buffer to small to ..."
-  //  myPort.readBytesUntil('&', inBuffer);
-  //  String dataString = new String(inBuffer);
-  //  if (!dataString.trim().isEmpty()) {
-  //    println("New"); //<>//
-  //    println(new String(inBuffer));
-  //    int moistureVal = (int)getValue(dataString, "aaa");
-  //    float humidity = getValue(dataString, "bbb");
-  //    moistureCutoff = (int)getValue(dataString, "ccc");
-  //    int lightVal = (int)getValue(dataString, "ddd");
-  //    float lightPercent = getValue(dataString, "eee");
-  //    lightCutoff = (int)getValue(dataString, "fff");
-  //    float temp = getValue(dataString, "ggg");
-  //    timeLeft = (int)getValue(dataString, "hhh");
-  //    drawBackground();
-  //    drawMoistureInfo(moistureVal, humidity, moistureCutoff);
-  //    drawLightInfo(lightVal, lightPercent, lightCutoff);
-  //    drawTempInfo(temp);
-  //    drawTimeLeft(timeLeft);
-  //  }
-  //}
+  if (0 < myPort.available()){
+    byte[] inBuffer = new byte[256]; //increase this number if issue is "buffer to small to ..."
+    myPort.readBytesUntil('&', inBuffer);
+    String dataString = new String(inBuffer);
+    if (!dataString.trim().isEmpty()) {
+      println("New"); //<>//
+      println(new String(inBuffer));
+      int moistureVal = (int)getValue(dataString, "aaa");
+      float humidity = getValue(dataString, "bbb");
+      moistureCutoff = (int)getValue(dataString, "ccc");
+      int lightVal = (int)getValue(dataString, "ddd");
+      float lightPercent = getValue(dataString, "eee");
+      lightCutoff = (int)getValue(dataString, "fff");
+      float temp = getValue(dataString, "ggg");
+      timeLeft = (int)getValue(dataString, "hhh");
+      maxTime = (int)getValue(dataString, "iii");
+      drawBackground();
+      drawMoistureInfo(moistureVal, humidity, moistureCutoff);
+      drawLightInfo(lightVal, lightPercent, lightCutoff);
+      drawTempInfo(temp);
+      drawTimeLeft(timeLeft);
+    }
+  }
   waterButton.draw();
   updateButton.draw();
 }
@@ -82,7 +84,7 @@ void draw(){ //<>//
 // Checks if buttons are pressed
 void mouseReleased() {
   if (waterButton.isOver()) {
-    String msg = "aaa1aaabbb" + moistureCutoff + "bbbccc" + lightCutoff + "cccddd" + 50000 + "ddd\r\n";
+    String msg = "aaa1aaabbb" + moistureCutoff + "bbbccc" + lightCutoff + "cccddd" + maxTime + "ddd\r\n";
     println(msg);
     //myPort.write(msg);
   }
@@ -103,7 +105,7 @@ void update() {
   }
   String t = p5.get(Textfield.class, timerField).getText();
   if (t.equals("")) {
-    t = Integer.toString(50000);
+    t = Integer.toString(maxTime);
   }
   String msg = "aaa0aaabbb" + mCutoff + "bbbccc" + lCutoff + "cccddd" + t + "ddd\r\n";
   println(msg);
