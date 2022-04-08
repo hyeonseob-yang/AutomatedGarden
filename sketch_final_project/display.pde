@@ -93,7 +93,8 @@ void draw(){ //<>//
 // Checks if buttons are pressed
 void mouseReleased() {
   if (waterButton.isOver()) {
-    String msg = "aaa1aaabbb" + moistureCutoff + "bbbccc" + lightCutoff + "cccddd" + maxTime + "ddd\r\n";
+    int maxSeconds = maxTime / 1000;
+    String msg = "aaa1aaabbb" + moistureCutoff + "bbbccc" + lightCutoff + "cccddd" + maxSeconds + "ddd\r\n";
     println(msg);
     myPort.write(msg);
   }
@@ -114,7 +115,8 @@ void update() {
   }
   String t = p5.get(Textfield.class, timerField).getText();
   if (t.equals("")) {
-    t = Integer.toString(maxTime);
+    int maxSeconds = maxTime / 1000;
+    t = Integer.toString(maxSeconds);
   }
   String msg = "aaa0aaabbb" + mCutoff + "bbbccc" + lCutoff + "cccddd" + t + "ddd\r\n";
   println(msg);
