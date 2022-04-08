@@ -29,7 +29,7 @@ void setup(){
   size(1000,1000);
   frameRate(10);
   printArray(Serial.list());
-  String port = Serial.list()[2]; // <-- make sure its the right port
+  String port = Serial.list()[0]; // <-- make sure its the right port
   myPort = new Serial(this, port, 9600);
   
   // if ur missing the font, on Processing, go to Tools tab, Create Font, and then find Consolas, size=48
@@ -100,8 +100,8 @@ void update() {
     mCutoff = Integer.toString(moistureCutoff);
   }
   String lCutoff = p5.get(Textfield.class, lightCutoffField).getText();
-  if (mCutoff.equals("")) {
-    mCutoff = Integer.toString(moistureCutoff);
+  if (lCutoff.equals("")) {
+    lCutoff = Integer.toString(lightCutoff);
   }
   String t = p5.get(Textfield.class, timerField).getText();
   if (t.equals("")) {
