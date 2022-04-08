@@ -87,22 +87,27 @@ void mouseReleased() {
     //myPort.write(msg);
   }
   if (updateButton.isOver()) {
-    String mCutoff = p5.get(Textfield.class, moistureCutoffField).getText();
-    if (mCutoff.equals("")) {
-      mCutoff = Integer.toString(moistureCutoff);
-    }
-    String lCutoff = p5.get(Textfield.class, lightCutoffField).getText();
-    if (mCutoff.equals("")) {
-      mCutoff = Integer.toString(moistureCutoff);
-    }
-    String t = p5.get(Textfield.class, timerField).getText();
-    if (t.equals("")) {
-      t = Integer.toString(50000);
-    }
-    String msg = "aaa0aaabbb" + mCutoff + "bbbccc" + lCutoff + "cccddd" + t + "ddd\r\n";
-    println(msg);
-    //myPort.write(msg);
+    update();
   }
+}
+
+// Updates Arduino values based on text input fields
+void update() {
+  String mCutoff = p5.get(Textfield.class, moistureCutoffField).getText();
+  if (mCutoff.equals("")) {
+    mCutoff = Integer.toString(moistureCutoff);
+  }
+  String lCutoff = p5.get(Textfield.class, lightCutoffField).getText();
+  if (mCutoff.equals("")) {
+    mCutoff = Integer.toString(moistureCutoff);
+  }
+  String t = p5.get(Textfield.class, timerField).getText();
+  if (t.equals("")) {
+    t = Integer.toString(50000);
+  }
+  String msg = "aaa0aaabbb" + mCutoff + "bbbccc" + lCutoff + "cccddd" + t + "ddd\r\n";
+  println(msg);
+  //myPort.write(msg);
 }
 
 // Draws background
