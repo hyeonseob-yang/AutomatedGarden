@@ -69,7 +69,7 @@ void loop() {
     bool isWater = dataString == "1";
     moistureCutoff = getValue(data, "bbb").toInt();
     lightCutoff = getValue(data, "ccc").toInt();
-    checkWaterTime = strtoul(getValue(data, "ddd").c_str(), NULL, 10);
+    checkWaterTime = strtoul(getValue(data, "ddd").c_str(), NULL, 10) * 1000;
     if (isWater) {
        water();
     }
