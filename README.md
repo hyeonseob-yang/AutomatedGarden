@@ -14,5 +14,5 @@
 1. Open sketch_final_project/display.pde in the Processing editor
 2. Navigate through Tools >> Create Font
 3. Select Consolas, size=48
-4. Navigate to Import Library >> Add Library
+4. Navigate through Import Library >> Add Library
 5. Install ControlP5
