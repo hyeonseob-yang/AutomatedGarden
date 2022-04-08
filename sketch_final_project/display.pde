@@ -86,7 +86,7 @@ void mouseReleased() {
   if (waterButton.isOver()) {
     String msg = "aaa1aaabbb" + moistureCutoff + "bbbccc" + lightCutoff + "cccddd" + maxTime + "ddd\r\n";
     println(msg);
-    //myPort.write(msg);
+    myPort.write(msg);
   }
   if (updateButton.isOver()) {
     update();
@@ -109,7 +109,7 @@ void update() {
   }
   String msg = "aaa0aaabbb" + mCutoff + "bbbccc" + lCutoff + "cccddd" + t + "ddd\r\n";
   println(msg);
-  //myPort.write(msg);
+  myPort.write(msg);
 }
 
 // Draws background
